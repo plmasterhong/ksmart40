@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="ksmart.mybatis.mapper.GoodsMapper">
+	
+	<resultMap type="Goods" id="goodsListResultMap">
+		<result property="goodsCode"		column="g_code"></result>
+		<result property="goodsName"		column="g_name"></result>
+		<result property="goodsPrice"		column="g_price"></result>
+		<result property="goodsSellerId"	column="g_seller_id"></result>
+		<result property="goodsRegDate"		column="g_reg_date"></result>
+		<!-- mybatis 복잡한 매핑 has one 관계 -->
+		<association property="member" javaType="Member">
+			<id 	property="memberId"			column="m_id"/>
+			<result property="memberPw" 		column="m_pw"/>
+			<result property="memberLevel" 		column="m_level"/>
+			<result property="memberName" 		column="m_name"/>
+			<result property="memberAddr" 		column="m_addr"/>
+			<result property="memberEmail" 		column="m_email"/>
+			<result property="memberRegDate" 	column="m_reg_date"/>
+		</association>
+	</resultMap>
+	
+	<insert id="addGoods" parameterType="Goods">
+		INSERT INTO tb_goods
+		(  g_code
+		  ,g_name
+		  ,g_price
+		  ,g_seller_id
+		  ,g_reg_date
+		)VALUES(
+		   #{goodsCode}
+		  ,#{goodsName}
+		  ,#{goodsPrice}
+		  ,#{goodsSellerId}
+		  ,CURDATE()
+		);
+		
+	</insert>
+
+	<select id="getNewGoodsCode" resultType="String">
+		SELECT
+		   CASE
+		   WHEN COUNT(1) = 0 THEN 'g001'
+		   ELSE
+		      CONCAT('g', LPAD(MAX(CAST(SUBSTRING(g_code,2,3)AS DECIMAL)+1),3,0))
+		   END AS goodsCode
+		FROM
+		   tb_goods;
+	
+	</select>
+
+	<select id="getGoodsList" parameterType="map" resultMap="goodsListResultMap">
+		 SELECT
+		 	 g.g_code
+		 	,g.g_name
+		 	,g.g_price
+		 	,g.g_seller_id
+		 	,g.g_reg_date
+		 	,m.m_id
+   			,m.m_name
+   			,m.m_email
+		 FROM
+		 	tb_goods as g
+		 	INNER JOIN 
+		 	tb_member as m
+		 	ON
+		 	g.g_seller_id = m.m_id
+		 <trim prefix="WHERE" prefixOverrides="AND |OR ">
+		 	<if test="searchKey != null and searchKey != ''.toString() and searchValue != null">
+		 		${searchKey} LIKE CONCAT('%', #{searchValue} ,'%')
+		 	</if>
+		 </trim>
+	</select>
+
+</mapper>

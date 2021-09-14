@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="@{layout/default}">
+
+<th:block layout:fragment="customTitle">
+	<title th:text="${title}"></title>
+</th:block>
+
+<!-- contents layout:fragment 정의 -->
+<th:block layout:fragment="customContents">
+	<form th:action="@{/goodsList}" method="get" style="padding-bottom: 10px;">
+		<!-- http://localhost/goodsList?searchKey=memberId&searchValue=id001 -->
+		<select name="searchKey">
+			<option value="goodsCode">상품코드</option>		
+			<option value="goodsName">상품이름</option>		
+			<option value="goodsSellerId">판매자아이디</option>		
+		</select>
+		<input type="text" name="searchValue"/>
+		<button type="submit">검색</button>
+	</form>
+	<table border="1">
+		<thead>
+			<tr>
+				<th>상품코드</th>
+				<th>상품명</th>
+				<th>상품가격</th>
+				<th>판매자아이디</th>
+				<th>판매자이름</th>
+				<th>판매자이메일</th>
+				<th>상품등록일자</th>
+				<th>수정</th>
+				<th>삭제</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:if="${#lists.size(goodsList) > 0}" th:each="l : ${goodsList}">
+				<td th:text="${l.goodsCode}"></td>
+				<td th:text="${l.goodsName}"></td>
+				<td th:text="${l.goodsPrice}"></td>
+				<td th:text="${l.goodsSellerId}"></td>
+				
+				<th:block th:object="${l.member}">				
+					<td th:text="*{memberName}"></td>
+					<td th:text="*{memberEmail}"></td>
+				</th:block>
+				<!-- /*
+					<td th:text="${l.member.memberEmail}"></td>
+				 */ -->
+				<td th:text="${l.goodsRegDate}"></td>
+				<td>
+					<!-- /medifyMember?memberId=id001 -->
+					<a th:href="@{/modifyGoods(goodsCode=${l.goodsCode})}">수정</a>
+				</td>
+				<td>
+					<!-- /removeMember?memberId=id001 -->
+					<a th:href="@{/removeGoods(goodsCode=${l.goodsCode})}">삭제</a>
+				</td>
+			</tr>
+			<tr	th:unless="${#lists.size(goodsList) > 0}">
+				<td colspan="9">조회된 데이터가 없습니다</td>
+			</tr>
+		</tbody>
+	</table>
+</th:block>
+
+</html>
