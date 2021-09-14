@@ -7,7 +7,7 @@
 	jdbc.connection : Logs connection open and close events
 -->
 <configuration>
-	<!-- 변수 지정 -->
+	<!-- 변수 지정1 -->
     <property name="LOG_DIR" value="src/main/resources/logs" />
     <property name="LOG_PATH_NAME" value="${LOG_DIR}/application.log" />
 	
